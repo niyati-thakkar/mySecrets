@@ -47,8 +47,13 @@ mongoose.connect(MONGODB_URL)
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
-  googleId: String
+  googleId: String,
 });
+
+const secretSchema = new mongoose.Schema({
+  secret: String
+});
+
 // mongoose.set("useCreateIndex", true);
 userSchema.plugin(passportLocalMongoose);
 // var secret = process.env.SECRET_KEY;
@@ -56,6 +61,8 @@ userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
 
 const User = new mongoose.model("user", userSchema);
+const Secret = new mongoose.model("secret", secretSchema);
+
 passport.use(User.createStrategy());
 passport.serializeUser(function(user, done) {
   done(null, user.id); 
@@ -72,7 +79,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "https://mysecrets.onrender.com/auth/google/secrets",
+  callbackURL: "https://secrets-2pln.onrender.com/auth/google/secrets",
   // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
 function(accessToken, refreshToken, profile, cb) {
@@ -104,10 +111,32 @@ app.get("/auth/google/secrets",
 
 app.get("/secrets", function(req,res){
   if(req.isAuthenticated()){
-    res.render("secrets");
+    Secret.find({}, function(err, result){
+      if(err) console.log(err);
+      else{
+        res.render("secrets", {list:result});
+      }
+    });
   } else{
     res.redirect("/login");
   }
+});
+
+app.get("/submit", function(req,res){
+  if(req.isAuthenticated()){
+    res.render("submit");
+  } else{
+    res.redirect("/login");
+  }
+});
+
+app.post("/submit", function(req,res){
+  const tempSecret = req.body.secret;
+ Secret.create({
+    secret: tempSecret
+  });
+  // Secret.save();
+  res.redirect("/submit");
 });
 
 app.post("/register", function(req,res){
@@ -192,6 +221,6 @@ app.get("/logout", function(req, res){
     res.redirect("/");
 });
 });
- app.listen(3000, function(req,res){
+ app.listen(3001, function(req,res){
    console.log("server started on port 3000");
  })
