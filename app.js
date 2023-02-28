@@ -136,7 +136,7 @@ app.post("/submit", function(req,res){
     secret: tempSecret
   });
   // Secret.save();
-  res.redirect("/submit");
+  res.redirect("/secrets");
 });
 
 app.post("/register", function(req,res){
