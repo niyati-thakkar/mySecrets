@@ -79,7 +79,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "https://secrets-2pln.onrender.com/auth/google/secrets",
+  callbackURL: "https://mysecrets.onrender.com/auth/google/secrets",
   // userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
 function(accessToken, refreshToken, profile, cb) {
@@ -221,6 +221,6 @@ app.get("/logout", function(req, res){
     res.redirect("/");
 });
 });
- app.listen(3001, function(req,res){
+ app.listen(3000, function(req,res){
    console.log("server started on port 3000");
  })
